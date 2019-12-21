@@ -1,0 +1,20 @@
+version 0.1
+
+input handled ==>
+
+node head.js 1.txt
+
+files ==>
+
+head.js
+headTest.js
+sampleFile.json
+appTest.sh
+edit package.json
+
+steps ==>
+
+parse arguments given from command line
+get content from sample file
+generate head message
+output 
