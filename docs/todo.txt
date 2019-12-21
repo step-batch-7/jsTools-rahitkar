@@ -2,7 +2,7 @@ version 0.1
 
 input handled ==>
 
-node head.js 1.txt
+node head.js sample.txt
 
 files ==>
 
