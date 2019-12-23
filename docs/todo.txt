@@ -14,7 +14,15 @@ edit package.json
 
 steps ==>
 
-parse arguments given from command line 
-get content from sample file done
-generate head message done
+parse arguments given from command line        ==done
+get content from sample file                   ==done
+generate head message                          ==done
 output 
+
+
+
+
+refactor steps 
+parseArgs             ==done
+getContents           ==
+performHeadAction
