@@ -6,15 +6,15 @@ node head.js sample.txt
 
 files ==>
 
-head.js
-headTest.js
-sampleFile.json
+head.js done
+headTest.js done
+sampleFile.json 
 appTest.sh
-edit package.json
+edit package.json 
 
 steps ==>
 
-parse arguments given from command line
-get content from sample file
-generate head message
+parse arguments given from command line 
+get content from sample file done
+generate head message done
 output 
