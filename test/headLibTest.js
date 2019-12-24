@@ -3,7 +3,7 @@ const {
   getContents,
   filterTopFileLines,
   parseArgs,
-  performHeadAction
+  performHead
 } = require("../src/headLib");
 
 describe("head", () => {
@@ -82,10 +82,10 @@ describe("head", () => {
 
       const args = ["sampleFile.json"];
       const helper = { exists: exists, reader: myReader };
-      const actual = performHeadAction(args, helper);
+      const actual = performHead(args, helper);
       const expected = {
         lines: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
-        stream: "stdout"
+        stream: "out"
       };
       assert.deepStrictEqual(actual, expected);
     });
@@ -99,10 +99,10 @@ describe("head", () => {
 
       const args = ["samplePathOfNotExistedFile.json"];
       const helper = { exists: exists, reader: myReader };
-      const actual = performHeadAction(args, helper);
+      const actual = performHead(args, helper);
       const expected = {
         lines: new Error(`head: ${args[0]}: No such file or directory`).message,
-        stream: "stderr"
+        stream: "err"
       };
       assert.deepStrictEqual(actual, expected);
     });

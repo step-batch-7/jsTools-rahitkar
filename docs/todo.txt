@@ -18,7 +18,3 @@ parse arguments given from command line        ==done
 get content from sample file                   ==done
 generate head message                          ==done
 output 
-
-
-
-

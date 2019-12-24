@@ -19,23 +19,23 @@ const parseArgs = (args, fileOperations) => {
   };
 };
 
-const performHeadAction = (args, fileOperations) => {
+const performHead = (args, fileOperations) => {
   const userArgs = parseArgs(args, fileOperations);
   const contents = getContents(userArgs.exists, userArgs.reader, userArgs.path);
 
   if (!contents.exists) {
     return {
       lines: new Error(`head: ${args[0]}: No such file or directory`).message,
-      stream: "stderr"
+      stream: "err"
     };
   }
 
-  return { lines: filterTopFileLines(contents.content), stream: "stdout" };
+  return { lines: filterTopFileLines(contents.content), stream: "out" };
 };
 
 module.exports = {
   getContents,
   filterTopFileLines,
   parseArgs,
-  performHeadAction
+  performHead: performHead
 };

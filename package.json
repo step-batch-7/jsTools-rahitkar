@@ -12,7 +12,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "nyc mocha"
+    "test": "nyc mocha; ./runAppTests.sh appTest/*.test"
   },
   "repository": {
     "type": "git",

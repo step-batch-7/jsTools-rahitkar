@@ -1,13 +1,13 @@
 const { existsSync, readFileSync } = require("fs");
-const { performHeadAction } = require("./src/headLib");
+const { performHead } = require("./src/headLib");
 
 const head = args => {
   const fileOperations = { exists: existsSync, reader: readFileSync };
 
-  const streams = { stdout: console.log, stderr: console.error };
-  
-  const stream = streams[performHeadAction(args, fileOperations).stream];
-  const content = performHeadAction(args, fileOperations).lines;
+  const streams = { out: console.log, err: console.error };
+
+  const stream = streams[performHead(args, fileOperations).stream];
+  const content = performHead(args, fileOperations).lines;
   stream(content);
 };
 
