@@ -1,21 +1,23 @@
 const assert = require("chai").assert;
-const generateHeadMessage = require("../src/headLib").generateHeadMessage;
-const getContents = require("../src/headLib").getContents;
-const parseArgs = require("../src/headLib").parseArgs;
-const performHeadAction = require("../src/headLib").performHeadAction;
+const {
+  getContents,
+  filterTopFileLines,
+  parseArgs,
+  performHeadAction
+} = require("../src/headLib");
 
 describe("head", () => {
-  describe("generateHeadMessage", () => {
+  describe("filterTopFileLines", () => {
     it("should give 10 lines of given file", () => {
       const fileContent = `1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n`;
-      const actual = generateHeadMessage(fileContent);
+      const actual = filterTopFileLines(fileContent);
       const expected = `1\n2\n3\n4\n5\n6\n7\n8\n9\n10`;
       assert.strictEqual(actual, expected);
     });
   });
 
   describe("getContents", () => {
-    it("should give contents of a given file along with flag 1", () => {
+    it("should give contents of a given file along with file existence indicator", () => {
       const exists = function(path) {
         assert.strictEqual(path, "./samplePath.json");
         return true;
@@ -27,12 +29,12 @@ describe("head", () => {
       };
 
       const actual = getContents(exists, myReader, "./samplePath.json");
-      const expected = { content: "hello", flag: 1 };
+      const expected = { content: "hello", exists: true };
 
       assert.deepStrictEqual(actual, expected);
     });
 
-    it("should give file not found message along with flag 0", () => {
+    it("should give file not found message along with exists 0", () => {
       const exists = function(path) {
         assert.strictEqual(path, "./samplePathOfNotExistedFile.json");
         return false;
@@ -43,7 +45,10 @@ describe("head", () => {
         myReader,
         "./samplePathOfNotExistedFile.json"
       );
-      const expected = { content: "not found", flag: 0 };
+      const expected = {
+        content: "file ./samplePathOfNotExistedFile.json not found",
+        exists: false
+      };
       assert.deepStrictEqual(actual, expected);
     });
   });
@@ -56,7 +61,7 @@ describe("head", () => {
       const expected = {
         exists: "exists",
         reader: "myReader",
-        path: "./sampleFile.txt"
+        path: "sampleFile.txt"
       };
 
       assert.deepStrictEqual(actual, expected);
@@ -66,25 +71,28 @@ describe("head", () => {
   describe("performHeadAction", () => {
     it("should give first 10 lines of given existing file", () => {
       const exists = function(path) {
-        assert.strictEqual(path, "./sampleFile.json");
+        assert.strictEqual(path, "sampleFile.json");
         return true;
       };
 
       const myReader = function(path) {
-        assert.strictEqual(path, "./sampleFile.json");
+        assert.strictEqual(path, "sampleFile.json");
         return "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n";
       };
 
       const args = ["sampleFile.json"];
       const helper = { exists: exists, reader: myReader };
       const actual = performHeadAction(args, helper);
-      const expected = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
-      assert.strictEqual(actual, expected);
+      const expected = {
+        lines: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
+        stream: "stdout"
+      };
+      assert.deepStrictEqual(actual, expected);
     });
 
     it("should give file not found message for given not existing file", () => {
       const exists = function(path) {
-        assert.strictEqual(path, "./samplePathOfNotExistedFile.json");
+        assert.strictEqual(path, "samplePathOfNotExistedFile.json");
         return false;
       };
       const myReader = path => {};
@@ -92,8 +100,11 @@ describe("head", () => {
       const args = ["samplePathOfNotExistedFile.json"];
       const helper = { exists: exists, reader: myReader };
       const actual = performHeadAction(args, helper);
-      const expected = `file ${args[0]} not found`;
-      assert.strictEqual(actual, expected);
+      const expected = {
+        lines: new Error(`head: ${args[0]}: No such file or directory`).message,
+        stream: "stderr"
+      };
+      assert.deepStrictEqual(actual, expected);
     });
   });
 });

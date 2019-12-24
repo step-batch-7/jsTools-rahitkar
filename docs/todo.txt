@@ -22,7 +22,3 @@ output
 
 
 
-refactor steps 
-parseArgs             ==done
-getContents           ==
-performHeadAction

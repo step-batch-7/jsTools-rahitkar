@@ -1,28 +1,41 @@
-const generateHeadMessage = fileContent => {
+const filterTopFileLines = fileContent => {
   const firstTenLineContents = fileContent.split("\n").slice(0, 10);
   return firstTenLineContents.join("\n");
 };
 
 const getContents = (exists, reader, filePath) => {
   if (exists(filePath)) {
-    return { content: reader(filePath, "utf8"), flag: 1 };
+    return { content: reader(filePath, "utf8"), exists: true };
   }
 
-  return { content: "not found", flag: 0 };
+  return { content: `file ${filePath} not found`, exists: false };
 };
 
-const parseArgs = (args, helper) => {
-  return { reader: helper.reader, exists: helper.exists, path: `./${args[0]}` };
+const parseArgs = (args, fileOperations) => {
+  return {
+    reader: fileOperations.reader,
+    exists: fileOperations.exists,
+    path: `${args[0]}`
+  };
 };
 
-const performHeadAction = (args, helper) => {
-  const userArgs = parseArgs(args, helper);
+const performHeadAction = (args, fileOperations) => {
+  const userArgs = parseArgs(args, fileOperations);
   const contents = getContents(userArgs.exists, userArgs.reader, userArgs.path);
-  if (contents.flag === 0) return `file ${args[0]} not found`;
-  return generateHeadMessage(contents.content);
+
+  if (!contents.exists) {
+    return {
+      lines: new Error(`head: ${args[0]}: No such file or directory`).message,
+      stream: "stderr"
+    };
+  }
+
+  return { lines: filterTopFileLines(contents.content), stream: "stdout" };
 };
 
-exports.getContents = getContents;
-exports.generateHeadMessage = generateHeadMessage;
-exports.parseArgs = parseArgs;
-exports.performHeadAction = performHeadAction;
+module.exports = {
+  getContents,
+  filterTopFileLines,
+  parseArgs,
+  performHeadAction
+};
