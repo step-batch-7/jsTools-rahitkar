@@ -1,0 +1,2 @@
+(node head.js badFile.json)
+head: badFile.json: No such file or directory

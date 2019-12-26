@@ -29,25 +29,27 @@ describe("head", () => {
       };
 
       const actual = getContents(exists, myReader, "./samplePath.json");
-      const expected = { content: "hello", exists: true };
+      const expected = { content: "hello", err: "" };
 
       assert.deepStrictEqual(actual, expected);
     });
 
     it("should give file not found message along with exists 0", () => {
       const exists = function(path) {
-        assert.strictEqual(path, "./samplePathOfNotExistedFile.json");
+        assert.strictEqual(path, "samplePathOfNotExistedFile.json");
         return false;
       };
       const myReader = path => {};
       const actual = getContents(
         exists,
         myReader,
-        "./samplePathOfNotExistedFile.json"
+        "samplePathOfNotExistedFile.json"
       );
       const expected = {
-        content: "file ./samplePathOfNotExistedFile.json not found",
-        exists: false
+        content: "",
+        err: new Error(
+          "head: samplePathOfNotExistedFile.json: No such file or directory"
+        ).message
       };
       assert.deepStrictEqual(actual, expected);
     });
@@ -84,8 +86,8 @@ describe("head", () => {
       const helper = { exists: exists, reader: myReader };
       const actual = performHead(args, helper);
       const expected = {
-        lines: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
-        stream: "out"
+        content: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
+        err: ""
       };
       assert.deepStrictEqual(actual, expected);
     });
@@ -101,8 +103,8 @@ describe("head", () => {
       const helper = { exists: exists, reader: myReader };
       const actual = performHead(args, helper);
       const expected = {
-        lines: new Error(`head: ${args[0]}: No such file or directory`).message,
-        stream: "err"
+        content: "",
+        err: new Error(`head: ${args[0]}: No such file or directory`).message
       };
       assert.deepStrictEqual(actual, expected);
     });

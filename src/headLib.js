@@ -1,17 +1,20 @@
-const filterTopFileLines = fileContent => {
+const filterTopFileLines = function(fileContent) {
   const firstTenLineContents = fileContent.split("\n").slice(0, 10);
   return firstTenLineContents.join("\n");
 };
 
-const getContents = (exists, reader, filePath) => {
+const getContents = function(exists, reader, filePath) {
   if (exists(filePath)) {
-    return { content: reader(filePath, "utf8"), exists: true };
+    return { content: reader(filePath, "utf8"), err: "" };
   }
 
-  return { content: `file ${filePath} not found`, exists: false };
+  const error = new Error(`head: ${filePath}: No such file or directory`)
+    .message;
+
+  return { content: "", err: error };
 };
 
-const parseArgs = (args, fileOperations) => {
+const parseArgs = function(args, fileOperations) {
   return {
     reader: fileOperations.reader,
     exists: fileOperations.exists,
@@ -19,18 +22,13 @@ const parseArgs = (args, fileOperations) => {
   };
 };
 
-const performHead = (args, fileOperations) => {
+const performHead = function(args, fileOperations) {
   const userArgs = parseArgs(args, fileOperations);
   const contents = getContents(userArgs.exists, userArgs.reader, userArgs.path);
 
-  if (!contents.exists) {
-    return {
-      lines: new Error(`head: ${args[0]}: No such file or directory`).message,
-      stream: "err"
-    };
-  }
+  if (contents.err) return contents;
 
-  return { lines: filterTopFileLines(contents.content), stream: "out" };
+  return { content: filterTopFileLines(contents.content), err: "" };
 };
 
 module.exports = {

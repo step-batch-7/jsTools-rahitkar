@@ -18,3 +18,8 @@ parse arguments given from command line        ==done
 get content from sample file                   ==done
 generate head message                          ==done
 output 
+
+refactor work ==>
+
+remove object lookup from main ==done
+refactor parse arguments  == 
