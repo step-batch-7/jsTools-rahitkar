@@ -1,24 +1,40 @@
 "use strict";
-const filterTopFileLines = function(fileContent) {
-  const firstTenLineContents = fileContent.split("\n").slice(0, 10);
+const filterTopFileLines = function(fileContent, lineNum) {
+  const firstTenLineContents = fileContent.split("\n").slice(0, lineNum);
   return firstTenLineContents.join("\n");
 };
 
 const writeToScreen = function(err, data) {
   if (data) {
-    this.writeToOutStream(filterTopFileLines(data));
+    this.writer.writeToOutStream(filterTopFileLines(data, this.lineNum));
   } else {
-    this.writeToErrorStream(`head: ${err.path}: No such file or directory`);
+    this.writer.writeToErrorStream(
+      `head: ${err.path}: No such file or directory`
+    );
   }
 };
 
-const performHead = function(path = "", reader, writer) {
+const parseArgs = function(args) {
+  if (args.includes("-n")) {
+    return {
+      lineNum: +args[args.lastIndexOf("-n") + 1],
+      path: args.slice(-1)[0]
+    };
+  }
+  return { lineNum: 10, path: args.slice(-1)[0] };
+};
+
+const performHead = function(args, reader, writer) {
+  const userArgs = parseArgs(args);
+
+  const lineNum = userArgs.lineNum;
   const encoding = "utf8";
-  reader(path, encoding, writeToScreen.bind(writer));
+  reader(userArgs.path, encoding, writeToScreen.bind({ writer, lineNum }));
 };
 
 module.exports = {
   performHead,
   writeToScreen,
-  filterTopFileLines
+  filterTopFileLines,
+  parseArgs
 };

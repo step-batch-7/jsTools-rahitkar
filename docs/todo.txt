@@ -29,7 +29,7 @@ in line getContent function                    ==done
 
 change the name of printer into writer         ==done
 
-remove else from printAfterReading function
+remove else from printAfterReading function    ==not done
 
 
 
@@ -53,5 +53,5 @@ same a version 0.1
 
 steps ==> 
 
-change parsing style of given arguments
+create a parser for argument parsing
 refactor the part of filtering top lines from a file content
