@@ -22,4 +22,36 @@ output
 refactor work ==>
 
 remove object lookup from main ==done
-refactor parse arguments  == 
+
+think about function name of printAfterReading ==done
+
+in line getContent function                    ==done
+
+change the name of printer into writer         ==done
+
+remove else from printAfterReading function
+
+
+
+
+
+
+
+
+
+
+
+version 0.2
+
+input handled ==>
+
+node head.js -n12 1.txt
+
+files ==> 
+
+same a version 0.1
+
+steps ==> 
+
+change parsing style of given arguments
+refactor the part of filtering top lines from a file content

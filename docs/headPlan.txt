@@ -1,9 +1,9 @@
 cases :
 1) flow with only given file                            node head.js 1.txt
 
-2) flow with piped input(stdin)                         cat 1.txt | node head.js
-
 3) flow with given file with line number                node head.js -n12 1.txt
+
+2) flow with piped input(stdin)                         cat 1.txt | node head.js
 
 4) flow with more then one file                         node head.js 1.txt 2.txt
 

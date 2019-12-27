@@ -1,9 +1,8 @@
 const assert = require("chai").assert;
 const {
-  getContents,
-  filterTopFileLines,
-  parseArgs,
-  performHead
+  performHead,
+  writeToScreen,
+  filterTopFileLines
 } = require("../src/headLib");
 
 describe("head", () => {
@@ -16,97 +15,60 @@ describe("head", () => {
     });
   });
 
-  describe("getContents", () => {
-    it("should give contents of a given file along with file existence indicator", () => {
-      const exists = function(path) {
-        assert.strictEqual(path, "./samplePath.json");
-        return true;
+  describe("writeToScreen", () => {
+    it("should check if data is present", () => {
+      const data = `1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12`;
+      const err = undefined;
+
+      const writeToOutStream = function(data) {
+        assert.strictEqual(data, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
       };
 
-      const myReader = function(path) {
-        assert.strictEqual(path, "./samplePath.json");
-        return "hello";
-      };
+      const writeToErrorStream = function() {};
 
-      const actual = getContents(exists, myReader, "./samplePath.json");
-      const expected = { content: "hello", err: "" };
+      const writer = { writeToOutStream, writeToErrorStream };
 
-      assert.deepStrictEqual(actual, expected);
+      writeToScreen.call(writer, err, data);
+      assert.deepStrictEqual(writer, { writeToOutStream, writeToErrorStream });
+      assert.strictEqual(err, undefined);
+      assert.strictEqual(data, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12");
     });
 
-    it("should give file not found message along with exists 0", () => {
-      const exists = function(path) {
-        assert.strictEqual(path, "samplePathOfNotExistedFile.json");
-        return false;
-      };
-      const myReader = path => {};
-      const actual = getContents(
-        exists,
-        myReader,
-        "samplePathOfNotExistedFile.json"
-      );
-      const expected = {
-        content: "",
-        err: new Error(
-          "head: samplePathOfNotExistedFile.json: No such file or directory"
-        ).message
-      };
-      assert.deepStrictEqual(actual, expected);
-    });
-  });
+    it("should check if err is present", () => {
+      const data = undefined;
+      const err = { path: "sampleFile" };
 
-  describe("parseArgs", () => {
-    it("should give a object with reader and file path", () => {
-      const args = ["sampleFile.txt"];
-      const helper = { reader: "myReader", exists: "exists" };
-      const actual = parseArgs(args, helper);
-      const expected = {
-        exists: "exists",
-        reader: "myReader",
-        path: "sampleFile.txt"
+      const writeToOutStream = function() {};
+
+      const writeToErrorStream = function(err) {
+        assert.strictEqual(err, "head: sampleFile: No such file or directory");
       };
 
-      assert.deepStrictEqual(actual, expected);
+      const writer = { writeToOutStream, writeToErrorStream };
+
+      writeToScreen.call(writer, err, data);
+      assert.deepStrictEqual(writer, {
+        writeToOutStream,
+        writeToErrorStream
+      });
+      assert.deepStrictEqual(err, { path: "sampleFile" });
+      assert.strictEqual(data, undefined);
     });
   });
 
-  describe("performHeadAction", () => {
-    it("should give first 10 lines of given existing file", () => {
-      const exists = function(path) {
-        assert.strictEqual(path, "sampleFile.json");
-        return true;
-      };
+  describe("performHead", () => {
+    it("should check is performHead is performing in a right manner or not", () => {
+      const writeToOutStream = function(data) {};
 
-      const myReader = function(path) {
-        assert.strictEqual(path, "sampleFile.json");
-        return "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n";
-      };
+      const writeToErrorStream = function() {};
 
-      const args = ["sampleFile.json"];
-      const helper = { exists: exists, reader: myReader };
-      const actual = performHead(args, helper);
-      const expected = {
-        content: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
-        err: ""
+      const path = "samplePath";
+      const writer = { writeToOutStream, writeToErrorStream };
+      const myReader = function(path, encoding) {
+        assert.strictEqual(path, "samplePath");
+        assert.strictEqual(encoding, "utf8");
       };
-      assert.deepStrictEqual(actual, expected);
-    });
-
-    it("should give file not found message for given not existing file", () => {
-      const exists = function(path) {
-        assert.strictEqual(path, "samplePathOfNotExistedFile.json");
-        return false;
-      };
-      const myReader = path => {};
-
-      const args = ["samplePathOfNotExistedFile.json"];
-      const helper = { exists: exists, reader: myReader };
-      const actual = performHead(args, helper);
-      const expected = {
-        content: "",
-        err: new Error(`head: ${args[0]}: No such file or directory`).message
-      };
-      assert.deepStrictEqual(actual, expected);
+      performHead(path, myReader, writer);
     });
   });
 });
