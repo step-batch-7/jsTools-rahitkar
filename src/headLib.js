@@ -1,35 +1,43 @@
-"use strict";
-const filterTopFileLines = function(fileContent, lineNum) {
-  const firstTenLineContents = fileContent.split("\n").slice(0, lineNum);
-  return firstTenLineContents.join("\n");
+'use strict';
+const filterTopFileLines = function(fileContent, end) {
+  const startFrom = 0;
+  const firstTenLineContents = 
+  fileContent.split('\n').slice(startFrom, end);
+
+  return firstTenLineContents.join('\n');
 };
 
-const writeToScreen = function(err, data) {
+const writeToScreen = function(writeScreenEquipment, err, data) {
+  
+  const writer = writeScreenEquipment.writer;
+  const lineNum = writeScreenEquipment.lineNum;
   if (data) {
-    this.writer.writeToOutStream(filterTopFileLines(data, this.lineNum));
+    writer.writeToOutStream(filterTopFileLines(data, lineNum));
   } else {
-    this.writer.writeToErrorStream(
-      `head: ${err.path}: No such file or directory`
-    );
+    writer.writeToErrorStream(`head: ${err.path}: No such file or directory`);
   }
 };
 
 const parseArgs = function(args) {
-  if (args.includes("-n")) {
-    return {
-      lineNum: +args[args.lastIndexOf("-n") + 1],
-      path: args.slice(-1)[0]
-    };
+  const defaultNumOfLines = 10;
+  const lastIndx = -1;
+  const secondLastIndx = -2;
+  const [filePath] = args.slice(lastIndx);
+  const lineNum= +args.slice(secondLastIndx, lastIndx);
+  
+  if(args.includes('-n') && Number.isInteger(lineNum)){
+    return {path: filePath, lineNum: +args.slice(secondLastIndx, lastIndx)};
   }
-  return { lineNum: 10, path: args.slice(-1)[0] };
+  return {path: filePath, lineNum: defaultNumOfLines};
 };
 
 const performHead = function(args, reader, writer) {
   const userArgs = parseArgs(args);
 
   const lineNum = userArgs.lineNum;
-  const encoding = "utf8";
-  reader(userArgs.path, encoding, writeToScreen.bind({ writer, lineNum }));
+  const encoding = 'utf8';
+  reader(userArgs.path, encoding, 
+    writeToScreen.bind(null, { writer, lineNum }));
 };
 
 module.exports = {
