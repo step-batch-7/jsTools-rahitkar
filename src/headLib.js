@@ -18,18 +18,26 @@ const writeToScreen = function(writeScreenEquipment, err, data) {
   }
 };
 
+
 const parseArgs = function(args) {
   const defaultNumOfLines = 10;
   const lastIndx = -1;
-  const secondLastIndx = -2;
   const [filePath] = args.slice(lastIndx);
-  const lineNum= +args.slice(secondLastIndx, lastIndx);
-  
-  if(args.includes('-n') && Number.isInteger(lineNum)){
-    return {path: filePath, lineNum: +args.slice(secondLastIndx, lastIndx)};
+  const [option, lineNum] = [...args];
+
+  if (!option.includes('-n')) {
+    return {path: filePath, lineNum: defaultNumOfLines};
   }
-  return {path: filePath, lineNum: defaultNumOfLines};
+
+  if(Number.isInteger(+lineNum)) {
+    return { path: filePath, lineNum: +lineNum};
+  }
+
+  if(Number.isInteger(+option.slice(lastIndx))) {
+    return {path: filePath, lineNum: +option.slice(lastIndx) };
+  }
 };
+  
 
 const performHead = function(args, reader, writer) {
   const userArgs = parseArgs(args);

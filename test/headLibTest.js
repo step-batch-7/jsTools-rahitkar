@@ -92,5 +92,12 @@ describe('head', () => {
       const expected = { lineNum: 10, path: 'samplePath' };
       assert.deepStrictEqual(actual, expected);
     });
+
+    it('should give line number and file path if "-nNumber" given', () => {
+      const args = ['-n8', 'samplePath'];
+      const actual = parseArgs(args);
+      const expected = { lineNum: 8, path: 'samplePath' };
+      assert.deepStrictEqual(actual, expected);
+    });
   });
 });
