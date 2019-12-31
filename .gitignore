@@ -1,5 +1,7 @@
-node_modules
-package-lock.json
-.nyc_output/
-sampleFile.json
 .eslintrc.json
+.nyc_output/
+node_modules/
+package-lock.json
+sampleFile.json
+.DS_Store
+

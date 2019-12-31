@@ -45,13 +45,50 @@ version 0.2
 
 input handled ==>
 
+node head.js 1.txt
+
 node head.js -n12 1.txt
+
+node head.js -n 12 1.txt
+
 
 files ==> 
 
-same a version 0.1
+same as version 0.1
 
 steps ==> 
 
-create a parser for argument parsing
-refactor the part of filtering top lines from a file content
+create a parser for argument parsing                          ==done
+refactor the part of filtering top lines from a file content  ==done
+add esLint                                                    ==done
+
+
+
+
+
+
+
+
+
+
+version 0.3 
+
+input handled ==> 
+
+standard input
+example :
+cat 1.txt | node head.js 
+
+cat 1.txt | node head.js -n 12
+
+cat 1.txt | node head.js -n12
+
+
+files ==> 
+
+same as version 0.1
+
+steps ==> 
+
+work on parser for stdin 
+refactor performHead's stdin part 
