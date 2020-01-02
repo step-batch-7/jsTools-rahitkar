@@ -1,8 +1,10 @@
 const assert = require('chai').assert;
+const sinon = require('sinon');
 const {
   head,
   writeToScreen,
   filterTopFileLines,
+  workOnStandardInput
 } = require('../src/headLib');
 
 describe('head', () => {
@@ -70,6 +72,26 @@ describe('head', () => {
         assert.strictEqual(encoding, 'utf8');
       };
       head(args, myReader, display);
+    });
+
+  });
+
+  describe('workOnStandardInput', () => {
+    it('should check if the flow is correct', () => {
+      const stdin = { setEncoding: sinon.fake(), on: sinon.fake() };
+
+      const lineNum = 12;
+      const display = (fileContent) => {
+        assert.strictEqual(fileContent.data, 'abc');
+        assert.strictEqual(fileContent.err, '');
+      };    
+
+      workOnStandardInput(stdin, display, lineNum);
+      assert(stdin.setEncoding.calledWith('utf8'));
+      assert.strictEqual(stdin.on.firstCall.args[0], 'data');
+      assert.strictEqual(stdin.on.callCount, 1);
+      stdin.on.firstCall.args[1]('abc');
+    
     });
   });
 });

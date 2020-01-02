@@ -52,4 +52,5 @@ module.exports = {
   head,
   writeToScreen,
   filterTopFileLines,
+  workOnStandardInput
 };
