@@ -1,13 +1,15 @@
 const {readFile} = require('fs');
-const performHead = require('./src/headLib').performHead;
+const head = require('./src/headLib').head;
 
-const writeToOutStream = data => process.stdout.write(data);
-const writeToErrorStream = data => process.stderr.write(data);
-
-const head = function(args) {
-  const writer = { writeToOutStream, writeToErrorStream };
-  performHead(args, readFile, writer, process);
+const display = headContent => {
+  
+  process.stdout.write(headContent.data);
+  process.stderr.write(headContent.err);
 };
 
-const unwantedSection = 2;
-head(process.argv.slice(unwantedSection));
+const main = function() {
+  const [, , ...args] = [...process.argv];
+  head(args, readFile, display, process.stdin);
+};
+
+main();

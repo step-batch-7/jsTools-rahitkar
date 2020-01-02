@@ -1,9 +1,8 @@
 const assert = require('chai').assert;
 const {
-  performHead,
+  head,
   writeToScreen,
   filterTopFileLines,
-  parseArgs
 } = require('../src/headLib');
 
 describe('head', () => {
@@ -22,18 +21,17 @@ describe('head', () => {
       const data = '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12';
       const err = undefined;
 
-      const writeToOutStream = function(data) {
-        assert.strictEqual(data, '1\n2\n3\n4\n5\n6\n7\n8');
+      const display = function(headContent) {
+        assert.deepStrictEqual(headContent, 
+          {data: '1\n2\n3\n4\n5\n6\n7\n8', err: ''});
       };
 
-      const writeToErrorStream = function() {};
 
-      const writer = { writeToOutStream, writeToErrorStream };
       const lineNum = 8;
-      writeToScreen({ writer, lineNum }, err, data);
+      writeToScreen({ display, lineNum }, err, data);
       assert.deepStrictEqual(
-        { writer, lineNum },
-        { writer: { writeToOutStream, writeToErrorStream }, lineNum: 8 }
+        { display, lineNum },
+        { display, lineNum: 8 }
       );
       assert.strictEqual(err, undefined);
       assert.strictEqual(data, '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12');
@@ -43,70 +41,35 @@ describe('head', () => {
       const data = undefined;
       const err = { path: 'sampleFile' };
 
-      const writeToOutStream = function() {};
 
-      const writeToErrorStream = function(err) {
-        assert.strictEqual(err, 'head: sampleFile: No such file or directory');
+      const display = function(headContent) {
+        assert.deepStrictEqual(headContent, {data: '', 
+          err: 'head: sampleFile: No such file or directory'});
       };
 
-      const writer = { writeToOutStream, writeToErrorStream };
       const lineNum = 8;
 
-      writeToScreen({ writer, lineNum }, err, data);
+      writeToScreen({ display, lineNum }, err, data);
       assert.deepStrictEqual(
-        { writer, lineNum },
-        { writer: { writeToOutStream, writeToErrorStream }, lineNum: 8 }
+        { display, lineNum },
+        {  display, lineNum: 8 }
       );
       assert.deepStrictEqual(err, { path: 'sampleFile' });
       assert.strictEqual(data, undefined);
     });
   });
 
-  describe('performHead', () => {
-    it('should check if performHead is performing in right manner', () => {
-      const writeToOutStream = function() {};
+  describe('head', () => {
+    it('should check if head is performing in right manner', () => {
+      const display = function() {};
 
-      const writeToErrorStream = function() {};
 
       const args = ['-n', '12', 'samplePath'];
-      const writer = { writeToOutStream, writeToErrorStream };
       const myReader = function(path, encoding) {
         assert.strictEqual(path, 'samplePath');
         assert.strictEqual(encoding, 'utf8');
       };
-      performHead(args, myReader, writer);
-    });
-  });
-
-  describe('parseArgs', () => {
-    it('should give line number and file path if option "-n" is given', () => {
-      const args = ['-n', '12', 'samplePath'];
-      const actual = parseArgs(args);
-      const expected = { lineNum: 12, path: 'samplePath', err: '' };
-      assert.deepStrictEqual(actual, expected);
-    });
-
-    it('should give line number as 10 and file path if is not given', () => {
-      const args = ['samplePath'];
-      const actual = parseArgs(args);
-      const expected = { lineNum: 10, path: 'samplePath', err: ''};
-      assert.deepStrictEqual(actual, expected);
-    });
-
-    it('should give line number and file path if "-nNumber" given', () => {
-      const args = ['-n8', 'samplePath'];
-      const actual = parseArgs(args);
-      const expected = { lineNum: 8, path: 'samplePath', err: ''};
-      assert.deepStrictEqual(actual, expected);
-    });
-    it('should give error for given wrong option', () => {
-      const args = ['-j8', 'samplePath'];
-      const actual = parseArgs(args);
-      const expected =  {lineNum: '', path: '',
-        err: `head: illegal option -- j
-    usage: head [-n lines | -c bytes] [file ...]`};
-
-      assert.deepStrictEqual(actual, expected);
+      head(args, myReader, display);
     });
   });
 });

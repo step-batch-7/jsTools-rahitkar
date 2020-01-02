@@ -92,3 +92,5 @@ steps ==>
 
 work on parser for stdin 
 refactor performHead's stdin part 
+performHead is taking four arguments have to refactor
+don't send process from main

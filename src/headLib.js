@@ -1,94 +1,55 @@
+const {parseArgs} = require('./parseArgs');
+
 const filterTopFileLines = function(fileContent, end) {
+  
   const startFrom = 0;
-  const firstTenLineContents = 
+  const topLineContents = 
   fileContent.split('\n').slice(startFrom, end);
 
-  return firstTenLineContents.join('\n');
+  return topLineContents.join('\n');
 };
 
 const writeToScreen = function(writeEquipment, err, data) {
   
-  const writer = writeEquipment.writer;
+  const display = writeEquipment.display;
   const lineNum = writeEquipment.lineNum;
+
   if (data) {
-    writer.writeToOutStream(filterTopFileLines(data, lineNum));
+    display({data: filterTopFileLines(data, lineNum), err: ''});
   } else {
-    writer.writeToErrorStream(`head: ${err.path}: No such file or directory`);
+    display({data: '', err: `head: ${err.path}: No such file or directory`});
   }
 };
 
-const creatUserArgs = function(option, lineNum, filePath) {
-  const defaultNumOfLines = 10;
-  const lastIndx = -1;
-  let userArgs = {path: filePath, lineNum: defaultNumOfLines, err: ''};
-  if (Number.isInteger(+lineNum)) {
-    userArgs = {path: filePath, lineNum: +lineNum, err: ''};
-  }
-
-  if(Number.isInteger(+option.slice(lastIndx))) {
-    userArgs = {path: filePath, lineNum: +option.slice(lastIndx), err: '' };
-  }
-  return userArgs;
-};
-
-const getFilePath = function(list, element) {
+const workOnStandardInput = function(stdin, display, lineNum) {
+  stdin.setEncoding('utf8');
   
-  if(!element.includes('-') && !Number.isInteger(+element)) {
-    list.push(element);
-  }
-  return list;
-};
-
-const parseArgs = function(args) {
-  
-  const [option, lineNum] = [...args];
-  const [filePath] = args.reduce(getFilePath, []);
-
-  if (!filePath) {
-    return {path: '', lineNum: '', err: ''};
-  }
-  
-  if(option[0] ==='-' && !(option[1] ==='n')){
-    return {path: '', lineNum: '', 
-      err: `head: illegal option -- ${option[1]}
-    usage: head [-n lines | -c bytes] [file ...]` };
-  }
-
-  const userArgs = creatUserArgs(option, lineNum, filePath);
-  return userArgs;
-};
-
-const workOnStandardInput = function(process, writeToOutStream) {
-  const defaultNumOfLines = 10;
-  process.stdin.setEncoding('utf8');
-
-  process.stdin.on('data', data => {
-    writeToOutStream(filterTopFileLines(data, defaultNumOfLines));
+  stdin.on('data', data => {
+    
+    display({data: filterTopFileLines(data, lineNum), err: ''});
   });
-  
 };
 
-const performHead = function(args, reader, writer, process) {
+const head = function(args, reader, display, stdin) {
   const userArgs = parseArgs(args);
-
+  const lineNum = userArgs.lineNum;
+  
+  
   if (userArgs.err) {
-    return writer.writeToErrorStream(userArgs.err);
+    return display(userArgs.err);
   }
-  if(!userArgs.path) {
-    workOnStandardInput(process, writer.writeToOutStream);
+  if (!userArgs.path) {
+    workOnStandardInput(stdin, display, lineNum);
     return;
   }
 
-  
-  const lineNum = userArgs.lineNum;
   const encoding = 'utf8';
   reader(userArgs.path, encoding, 
-    writeToScreen.bind(null, { writer, lineNum }));
+    writeToScreen.bind(null, {display, lineNum }));
 };
 
 module.exports = {
-  performHead,
+  head,
   writeToScreen,
   filterTopFileLines,
-  parseArgs
 };
