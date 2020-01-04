@@ -9,15 +9,19 @@ const filterTopFileLines = function(fileContent, end) {
   return topLineContents.join('\n');
 };
 
-const writeToScreen = function(writeEquipment, err, data) {
+const writeToScreen = function(writeEquipment, error, data) {
   
   const display = writeEquipment.display;
   const lineNum = writeEquipment.lineNum;
 
   if (data) {
-    display({data: filterTopFileLines(data, lineNum), err: ''});
+    const fileContent = filterTopFileLines(data, lineNum);
+    const err = '';
+    display(fileContent, err);
   } else {
-    display({data: '', err: `head: ${err.path}: No such file or directory`});
+    const fileContent = '';
+    const err = `head: ${error.path}: No such file or directory`;
+    display(fileContent, err);
   }
 };
 
@@ -32,11 +36,12 @@ const workOnStandardInput = function(stdin, display, lineNum) {
 
 const head = function(args, reader, display, stdin) {
   const userArgs = parseArgs(args);
+  
   const lineNum = userArgs.lineNum;
   
-  
   if (userArgs.err) {
-    return display(userArgs.err);
+
+    return display('', userArgs.err); 
   }
   if (!userArgs.path) {
     workOnStandardInput(stdin, display, lineNum);
@@ -45,7 +50,7 @@ const head = function(args, reader, display, stdin) {
 
   const encoding = 'utf8';
   reader(userArgs.path, encoding, 
-    writeToScreen.bind(null, {display, lineNum }));
+    writeToScreen.bind(null, {display, lineNum}));
 };
 
 module.exports = {

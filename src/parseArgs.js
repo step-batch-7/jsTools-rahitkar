@@ -26,7 +26,6 @@ const getFilePath = function(list, element) {
 
 const parseArgs = function(args) {
   
-  
   const [option, lineNum] = [...args];
   const [filePath] = args.reduce(getFilePath, []);
   
@@ -36,13 +35,12 @@ const parseArgs = function(args) {
   }
   
   const zeroedIndex = 0, firstIndex = 1;
-  if (option[zeroedIndex] ==='-' && !(option[firstIndex] ==='n')) { 
+  if (option[zeroedIndex] === '-' && !(option[firstIndex] === 'n')) { 
     
     return {path: '', lineNum: '', 
       err: `head: illegal option -- ${option[firstIndex]}
-    usage: head [-n lines | -c bytes] [file ...]` };
+    usage: head [-n lines | -c bytes] [file ...]`};
   }
-  
   
   const userArgs = creatUserArgs(lineNum, option);
   
@@ -50,4 +48,15 @@ const parseArgs = function(args) {
   return userArgs;
 };
 
-module.exports = {parseArgs} ;
+// const parseArgs = function(args) {
+//   const userObj = {'-n': '', filePath: ''};
+
+//   const dash = args.join(' ');
+//    for(i = 0; i < dash.length; i++) {
+//       if (dash[i] === '-') {
+        
+//       }
+//    }
+// };
+
+module.exports = {parseArgs};
